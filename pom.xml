@@ -8,7 +8,7 @@
         <version>3.2.1</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
-    <groupId>com.damnation.yt</groupId>
+    <groupId>com.cantcode.yt</groupId>
     <artifactId>yt-file-management</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <packaging>pom</packaging>

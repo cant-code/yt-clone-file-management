@@ -1,4 +1,4 @@
-package com.damnation.yt.filemanagement.database;
+package com.cantcode.yt.filemanagement.database;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

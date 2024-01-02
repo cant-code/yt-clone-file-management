@@ -1,0 +1,12 @@
+spring:
+  application:
+    name: File-Management Database Loader
+  datasource:
+    url: jdbc:postgresql://localhost:5432/file_management
+    username: postgres
+    password: pass
+  liquibase:
+    url: jdbc:postgresql://localhost:5432/file_management
+    user: postgres
+    password: pass
+    change-log: liquibase/db.changelog-master.xml
