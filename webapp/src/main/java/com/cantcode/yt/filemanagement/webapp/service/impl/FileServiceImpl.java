@@ -10,6 +10,8 @@ import com.cantcode.yt.filemanagement.webapp.repository.entities.RawVideo;
 import com.cantcode.yt.filemanagement.webapp.repository.entities.Videos;
 import com.cantcode.yt.filemanagement.webapp.service.spi.FileService;
 import jakarta.transaction.Transactional;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
@@ -23,6 +25,7 @@ import java.util.UUID;
 @Service
 public class FileServiceImpl implements FileService {
 
+    private static final Logger log = LoggerFactory.getLogger(FileServiceImpl.class);
     private final S3Client s3Client;
     private final VideosRepository videosRepository;
     private final RawVideoRepository rawVideoRepository;
@@ -50,6 +53,7 @@ public class FileServiceImpl implements FileService {
                     .contentLength(multipartFile.getSize())
                     .build();
 
+            log.info("Uploading file to S3 for user: {} with fileName: {}", userId, fileName);
             s3Client.putObject(request, RequestBody.fromBytes(multipartFile.getBytes()));
 
             final Videos video = createVideo(userId, multipartFile, videoRequest);
@@ -60,7 +64,8 @@ public class FileServiceImpl implements FileService {
 
             //TODO: Send message to Video-Processing service to transcode video
         } catch (Exception e) {
-            throw new FileUploadException("Exception while reading uploaded file", e);
+            log.error("Error while uploading file for userId: {}", userId);
+            throw new FileUploadException("Error while uploading file", e);
         }
     }
 
