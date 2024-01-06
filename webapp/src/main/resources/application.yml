@@ -18,3 +18,6 @@ aws:
   s3:
     url: http://localhost:9000
     region: ap-south-1
+    buckets:
+      raw-videos: raw-videos
+      transcoded-videos: transcoded-videos

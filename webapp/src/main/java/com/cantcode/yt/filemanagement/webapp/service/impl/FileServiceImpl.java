@@ -8,6 +8,7 @@ import com.cantcode.yt.filemanagement.webapp.repository.entities.RawVideo;
 import com.cantcode.yt.filemanagement.webapp.repository.entities.Videos;
 import com.cantcode.yt.filemanagement.webapp.service.spi.FileService;
 import jakarta.transaction.Transactional;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
@@ -24,13 +25,16 @@ public class FileServiceImpl implements FileService {
     private final S3Client s3Client;
     private final VideosRepository videosRepository;
     private final RawVideoRepository rawVideoRepository;
+    private final String rawVideosBucket;
 
     public FileServiceImpl(final S3Client s3Client,
                            final VideosRepository videosRepository,
-                           final RawVideoRepository rawVideoRepository) {
+                           final RawVideoRepository rawVideoRepository,
+                           @Value("${aws.s3.buckets.raw-videos}") final String rawVideosBucket) {
         this.s3Client = s3Client;
         this.videosRepository = videosRepository;
         this.rawVideoRepository = rawVideoRepository;
+        this.rawVideosBucket = rawVideosBucket;
     }
 
     @Override
@@ -39,7 +43,7 @@ public class FileServiceImpl implements FileService {
         try {
             final String fileName = generateFileName(multipartFile.getName());
             final PutObjectRequest request = PutObjectRequest.builder()
-                    .bucket("test")
+                    .bucket(rawVideosBucket)
                     .key(fileName)
                     .contentType(multipartFile.getContentType())
                     .contentLength(multipartFile.getSize())
