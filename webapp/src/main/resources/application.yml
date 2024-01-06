@@ -1,0 +1,20 @@
+spring:
+  application:
+    name: File-Management Service
+  datasource:
+    url: jdbc:postgresql://localhost:5432/file_management
+    username: postgres
+    password: pass
+  servlet:
+    multipart:
+      max-file-size: -1
+      max-request-size: -1
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:8900/realms/yt-clone
+aws:
+  s3:
+    url: http://localhost:9000
+    region: ap-south-1
