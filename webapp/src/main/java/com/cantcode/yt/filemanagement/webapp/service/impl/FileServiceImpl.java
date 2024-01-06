@@ -1,6 +1,8 @@
 package com.cantcode.yt.filemanagement.webapp.service.impl;
 
+import com.cantcode.yt.filemanagement.webapp.configs.properties.S3BucketProperties;
 import com.cantcode.yt.filemanagement.webapp.enums.TranscodingStatus;
+import com.cantcode.yt.filemanagement.webapp.exceptions.FileUploadException;
 import com.cantcode.yt.filemanagement.webapp.model.UploadVideoRequest;
 import com.cantcode.yt.filemanagement.webapp.repository.RawVideoRepository;
 import com.cantcode.yt.filemanagement.webapp.repository.VideosRepository;
@@ -8,7 +10,6 @@ import com.cantcode.yt.filemanagement.webapp.repository.entities.RawVideo;
 import com.cantcode.yt.filemanagement.webapp.repository.entities.Videos;
 import com.cantcode.yt.filemanagement.webapp.service.spi.FileService;
 import jakarta.transaction.Transactional;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
@@ -25,16 +26,16 @@ public class FileServiceImpl implements FileService {
     private final S3Client s3Client;
     private final VideosRepository videosRepository;
     private final RawVideoRepository rawVideoRepository;
-    private final String rawVideosBucket;
+    private final S3BucketProperties s3BucketProperties;
 
     public FileServiceImpl(final S3Client s3Client,
                            final VideosRepository videosRepository,
                            final RawVideoRepository rawVideoRepository,
-                           @Value("${aws.s3.buckets.raw-videos}") final String rawVideosBucket) {
+                           final S3BucketProperties s3BucketProperties) {
         this.s3Client = s3Client;
         this.videosRepository = videosRepository;
         this.rawVideoRepository = rawVideoRepository;
-        this.rawVideosBucket = rawVideosBucket;
+        this.s3BucketProperties = s3BucketProperties;
     }
 
     @Override
@@ -43,7 +44,7 @@ public class FileServiceImpl implements FileService {
         try {
             final String fileName = generateFileName(multipartFile.getName());
             final PutObjectRequest request = PutObjectRequest.builder()
-                    .bucket(rawVideosBucket)
+                    .bucket(s3BucketProperties.getRawVideos())
                     .key(fileName)
                     .contentType(multipartFile.getContentType())
                     .contentLength(multipartFile.getSize())
@@ -59,7 +60,7 @@ public class FileServiceImpl implements FileService {
 
             //TODO: Send message to Video-Processing service to transcode video
         } catch (Exception e) {
-            throw new RuntimeException("Exception while reading uploaded file", e);
+            throw new FileUploadException("Exception while reading uploaded file", e);
         }
     }
 
