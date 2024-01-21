@@ -1,3 +1,10 @@
+spring:
+  datasource:
+    username: postgres
+    password: pass
+  artemis:
+    user: artemis
+    password: artemis
 aws:
   s3:
     accessKey: ievgIQw0QLGQhbTPqvE4

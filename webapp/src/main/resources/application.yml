@@ -3,8 +3,6 @@ spring:
     name: File-Management Service
   datasource:
     url: jdbc:postgresql://localhost:5432/file_management
-    username: postgres
-    password: pass
   servlet:
     multipart:
       max-file-size: -1
@@ -14,6 +12,9 @@ spring:
       resourceserver:
         jwt:
           issuer-uri: http://localhost:8900/realms/yt-clone
+  artemis:
+    broker-url: tcp://localhost:61616
+    queue: queue/test
 aws:
   s3:
     url: http://localhost:9000

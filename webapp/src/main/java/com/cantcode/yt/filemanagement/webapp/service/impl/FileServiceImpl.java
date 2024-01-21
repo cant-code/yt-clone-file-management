@@ -3,11 +3,13 @@ package com.cantcode.yt.filemanagement.webapp.service.impl;
 import com.cantcode.yt.filemanagement.webapp.configs.properties.S3BucketProperties;
 import com.cantcode.yt.filemanagement.webapp.enums.TranscodingStatus;
 import com.cantcode.yt.filemanagement.webapp.exceptions.FileUploadException;
+import com.cantcode.yt.filemanagement.webapp.model.FileProcessingMessage;
 import com.cantcode.yt.filemanagement.webapp.model.UploadVideoRequest;
 import com.cantcode.yt.filemanagement.webapp.repository.RawVideoRepository;
 import com.cantcode.yt.filemanagement.webapp.repository.VideosRepository;
 import com.cantcode.yt.filemanagement.webapp.repository.entities.RawVideo;
 import com.cantcode.yt.filemanagement.webapp.repository.entities.Videos;
+import com.cantcode.yt.filemanagement.webapp.service.messaging.MessagingService;
 import com.cantcode.yt.filemanagement.webapp.service.spi.FileService;
 import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
@@ -30,15 +32,18 @@ public class FileServiceImpl implements FileService {
     private final VideosRepository videosRepository;
     private final RawVideoRepository rawVideoRepository;
     private final S3BucketProperties s3BucketProperties;
+    private final MessagingService messagingService;
 
     public FileServiceImpl(final S3Client s3Client,
                            final VideosRepository videosRepository,
                            final RawVideoRepository rawVideoRepository,
-                           final S3BucketProperties s3BucketProperties) {
+                           final S3BucketProperties s3BucketProperties,
+                           final MessagingService messagingService) {
         this.s3Client = s3Client;
         this.videosRepository = videosRepository;
         this.rawVideoRepository = rawVideoRepository;
         this.s3BucketProperties = s3BucketProperties;
+        this.messagingService = messagingService;
     }
 
     @Override
@@ -54,19 +59,24 @@ public class FileServiceImpl implements FileService {
                     .build();
 
             log.info("Uploading file to S3 for user: {} with fileName: {}", userId, fileName);
-            s3Client.putObject(request, RequestBody.fromBytes(multipartFile.getBytes()));
+            s3Client.putObject(request, RequestBody.fromInputStream(multipartFile.getInputStream(), multipartFile.getSize()));
 
-            final Videos video = createVideo(userId, multipartFile, videoRequest);
-            videosRepository.save(video);
+            final Videos video = videosRepository.save(createVideo(userId, multipartFile, videoRequest));
 
-            final RawVideo rawVideo = createRawVideo(multipartFile, video, fileName);
-            rawVideoRepository.save(rawVideo);
+            final RawVideo rawVideo = rawVideoRepository.save(createRawVideo(multipartFile, video, fileName));
 
-            //TODO: Send message to Video-Processing service to transcode video
+            messagingService.sendMessage(getFileProcessingMessage(rawVideo));
         } catch (Exception e) {
             log.error("Error while uploading file for userId: {}", userId);
             throw new FileUploadException("Error while uploading file", e);
         }
+    }
+
+    private FileProcessingMessage getFileProcessingMessage(final RawVideo rawVideo) {
+        final FileProcessingMessage message = new FileProcessingMessage();
+        message.setFileId(rawVideo.getId());
+        message.setFileName(rawVideo.getLink());
+        return message;
     }
 
     private RawVideo createRawVideo(final MultipartFile multipartFile, final Videos video, final String fileName) {
