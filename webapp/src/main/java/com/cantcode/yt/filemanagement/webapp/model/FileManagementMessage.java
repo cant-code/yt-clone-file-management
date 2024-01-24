@@ -3,14 +3,14 @@ package com.cantcode.yt.filemanagement.webapp.model;
 import java.util.List;
 
 public class FileManagementMessage {
-    private String fileId;
+    private Long fileId;
     private List<FileDetail> files;
 
-    public String getFileId() {
+    public Long getFileId() {
         return fileId;
     }
 
-    public void setFileId(String fileId) {
+    public void setFileId(Long fileId) {
         this.fileId = fileId;
     }
 

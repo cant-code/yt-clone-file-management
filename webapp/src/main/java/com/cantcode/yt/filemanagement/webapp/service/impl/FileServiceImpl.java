@@ -3,10 +3,13 @@ package com.cantcode.yt.filemanagement.webapp.service.impl;
 import com.cantcode.yt.filemanagement.webapp.configs.properties.S3BucketProperties;
 import com.cantcode.yt.filemanagement.webapp.enums.TranscodingStatus;
 import com.cantcode.yt.filemanagement.webapp.exceptions.FileUploadException;
+import com.cantcode.yt.filemanagement.webapp.model.FileManagementMessage;
 import com.cantcode.yt.filemanagement.webapp.model.FileProcessingMessage;
 import com.cantcode.yt.filemanagement.webapp.model.UploadVideoRequest;
+import com.cantcode.yt.filemanagement.webapp.repository.EncodedVideosRepository;
 import com.cantcode.yt.filemanagement.webapp.repository.RawVideoRepository;
 import com.cantcode.yt.filemanagement.webapp.repository.VideosRepository;
+import com.cantcode.yt.filemanagement.webapp.repository.entities.EncodedVideo;
 import com.cantcode.yt.filemanagement.webapp.repository.entities.RawVideo;
 import com.cantcode.yt.filemanagement.webapp.repository.entities.Videos;
 import com.cantcode.yt.filemanagement.webapp.service.messaging.MessagingService;
@@ -22,28 +25,35 @@ import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
+
+import static org.springframework.util.CollectionUtils.isEmpty;
 
 @Service
 public class FileServiceImpl implements FileService {
 
     private static final Logger log = LoggerFactory.getLogger(FileServiceImpl.class);
     private final S3Client s3Client;
+    private final MessagingService messagingService;
     private final VideosRepository videosRepository;
     private final RawVideoRepository rawVideoRepository;
     private final S3BucketProperties s3BucketProperties;
-    private final MessagingService messagingService;
+    private final EncodedVideosRepository encodedVideosRepository;
 
     public FileServiceImpl(final S3Client s3Client,
                            final VideosRepository videosRepository,
                            final RawVideoRepository rawVideoRepository,
                            final S3BucketProperties s3BucketProperties,
-                           final MessagingService messagingService) {
+                           final MessagingService messagingService,
+                           final EncodedVideosRepository encodedVideosRepository) {
         this.s3Client = s3Client;
         this.videosRepository = videosRepository;
         this.rawVideoRepository = rawVideoRepository;
         this.s3BucketProperties = s3BucketProperties;
         this.messagingService = messagingService;
+        this.encodedVideosRepository = encodedVideosRepository;
     }
 
     @Override
@@ -72,9 +82,34 @@ public class FileServiceImpl implements FileService {
         }
     }
 
+    @Override
+    @Transactional
+    public void processMessage(final FileManagementMessage message) {
+        saveEncodedVideos(message);
+        updateVideoStatus(message.getFileId());
+    }
+
+    private void saveEncodedVideos(final FileManagementMessage message) {
+        if (!isEmpty(message.getFiles())) {
+            final List<EncodedVideo> videos = new ArrayList<>();
+            message.getFiles().forEach(fileDetail -> {
+                final EncodedVideo video = new EncodedVideo();
+                video.setVideoId(message.getFileId());
+                video.setLink(fileDetail.getFileName());
+                video.setQuality(String.valueOf(fileDetail.getQuality()));
+                videos.add(video);
+            });
+            encodedVideosRepository.saveAll(videos);
+        }
+    }
+
+    private void updateVideoStatus(final Long videoId) {
+        videosRepository.findById(videoId).ifPresent(videos -> videos.setStatus(TranscodingStatus.PROCESSED));
+    }
+
     private FileProcessingMessage getFileProcessingMessage(final RawVideo rawVideo) {
         final FileProcessingMessage message = new FileProcessingMessage();
-        message.setFileId(rawVideo.getId());
+        message.setFileId(rawVideo.getVideoId());
         message.setFileName(rawVideo.getLink());
         return message;
     }

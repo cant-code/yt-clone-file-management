@@ -1,16 +1,14 @@
 package com.cantcode.yt.filemanagement.webapp.service.messaging;
 
-import com.cantcode.yt.filemanagement.webapp.model.FileManagementMessage;
 import com.cantcode.yt.filemanagement.webapp.model.FileProcessingMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jms.JmsException;
-import org.springframework.jms.annotation.JmsListener;
 import org.springframework.jms.core.JmsTemplate;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
-@Component
+@Service
 public class MessagingService {
 
     private static final Logger log = LoggerFactory.getLogger(MessagingService.class);
@@ -29,10 +27,5 @@ public class MessagingService {
         } catch (JmsException e) {
             log.error("Error sending message", e);
         }
-    }
-
-    @JmsListener(destination = "${spring.artemis.managementQueue}")
-    public void receiveMessage(final FileManagementMessage message) {
-        //TODO: Process message
     }
 }
