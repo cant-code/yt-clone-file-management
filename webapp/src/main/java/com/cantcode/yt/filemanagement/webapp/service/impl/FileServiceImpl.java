@@ -68,7 +68,8 @@ public class FileServiceImpl implements FileService {
                     .contentLength(multipartFile.getSize())
                     .build();
 
-            log.info("Uploading file to S3 for user: {} with fileName: {}", userId, fileName);
+            String logFileName = fileName.replaceAll("[\n\r]", "_");
+            log.info("Uploading file to S3 for user: {} with fileName: {}", userId, logFileName);
             s3Client.putObject(request, RequestBody.fromInputStream(multipartFile.getInputStream(), multipartFile.getSize()));
 
             final Videos video = videosRepository.save(createVideo(userId, multipartFile, videoRequest));
