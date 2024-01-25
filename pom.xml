@@ -22,7 +22,7 @@
         <java.version>17</java.version>
         <aws.sdk.version>2.22.9</aws.sdk.version>
 
-        <sonar.exclusions>com/cantcode/yt/filemanagement/webapp/model/*.java,com/cantcode/yt/filemanagement/webapp/repository/entities/*.java</sonar.exclusions>
+        <sonar.exclusions>webapp/src/main/java/com/cantcode/yt/filemanagement/webapp/model/*.java,webapp/src/main/java/com/cantcode/yt/filemanagement/webapp/repository/entities/*.java</sonar.exclusions>
     </properties>
 
     <dependencyManagement>
