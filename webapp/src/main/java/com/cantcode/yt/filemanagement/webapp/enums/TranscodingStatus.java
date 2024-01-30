@@ -4,5 +4,6 @@ public enum TranscodingStatus {
     CREATED,
     IN_PROGRESS,
     PROCESSED,
-    FAILED
+    FAILED,
+    PARTIALLY_PROCESSED
 }

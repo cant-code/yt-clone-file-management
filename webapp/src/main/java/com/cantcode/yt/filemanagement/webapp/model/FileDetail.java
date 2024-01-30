@@ -3,6 +3,8 @@ package com.cantcode.yt.filemanagement.webapp.model;
 public class FileDetail {
     private String fileName;
     private int quality;
+    private boolean success;
+    private String error;
 
     public String getFileName() {
         return fileName;
@@ -18,5 +20,21 @@ public class FileDetail {
 
     public void setQuality(int quality) {
         this.quality = quality;
+    }
+
+    public boolean isSuccess() {
+        return success;
+    }
+
+    public void setSuccess(boolean success) {
+        this.success = success;
+    }
+
+    public String getError() {
+        return error;
+    }
+
+    public void setError(String error) {
+        this.error = error;
     }
 }

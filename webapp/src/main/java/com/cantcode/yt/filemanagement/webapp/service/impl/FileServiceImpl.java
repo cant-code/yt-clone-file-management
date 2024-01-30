@@ -3,6 +3,7 @@ package com.cantcode.yt.filemanagement.webapp.service.impl;
 import com.cantcode.yt.filemanagement.webapp.configs.properties.S3BucketProperties;
 import com.cantcode.yt.filemanagement.webapp.enums.TranscodingStatus;
 import com.cantcode.yt.filemanagement.webapp.exceptions.FileUploadException;
+import com.cantcode.yt.filemanagement.webapp.model.FileDetail;
 import com.cantcode.yt.filemanagement.webapp.model.FileManagementMessage;
 import com.cantcode.yt.filemanagement.webapp.model.FileProcessingMessage;
 import com.cantcode.yt.filemanagement.webapp.model.UploadVideoRequest;
@@ -87,25 +88,43 @@ public class FileServiceImpl implements FileService {
     @Transactional
     public void processMessage(final FileManagementMessage message) {
         saveEncodedVideos(message);
-        updateVideoStatus(message.getFileId());
+        updateVideoStatus(message);
     }
 
     private void saveEncodedVideos(final FileManagementMessage message) {
         if (!isEmpty(message.getFiles())) {
             final List<EncodedVideo> videos = new ArrayList<>();
-            message.getFiles().forEach(fileDetail -> {
-                final EncodedVideo video = new EncodedVideo();
-                video.setVideoId(message.getFileId());
-                video.setLink(fileDetail.getFileName());
-                video.setQuality(String.valueOf(fileDetail.getQuality()));
-                videos.add(video);
-            });
+            message.getFiles()
+                    .stream()
+                    .filter(FileDetail::isSuccess)
+                    .forEach(fileDetail -> {
+                        if (fileDetail.isSuccess()) {
+                            final EncodedVideo video = new EncodedVideo();
+                            video.setVideoId(message.getFileId());
+                            video.setLink(fileDetail.getFileName());
+                            video.setQuality(String.valueOf(fileDetail.getQuality()));
+                            videos.add(video);
+                        } else {
+                            log.error(fileDetail.getError());
+                        }
+                    });
             encodedVideosRepository.saveAll(videos);
         }
+        log.info("Saved Encoded videos for videoId: {}", message.getFileId());
     }
 
-    private void updateVideoStatus(final Long videoId) {
-        videosRepository.findById(videoId).ifPresent(videos -> videos.setStatus(TranscodingStatus.PROCESSED));
+    private void updateVideoStatus(final FileManagementMessage message) {
+        final long count = message.getFiles().stream().filter(FileDetail::isSuccess).count();
+        final TranscodingStatus status = switch ((int) count) {
+            case 3:
+                yield TranscodingStatus.PROCESSED;
+            case 0:
+                yield TranscodingStatus.FAILED;
+            default:
+                yield TranscodingStatus.PARTIALLY_PROCESSED;
+        };
+        videosRepository.findById(message.getFileId()).ifPresent(videos -> videos.setStatus(status));
+        log.info("Updated video status for videoId: {}", message.getFileId());
     }
 
     private FileProcessingMessage getFileProcessingMessage(final RawVideo rawVideo) {
