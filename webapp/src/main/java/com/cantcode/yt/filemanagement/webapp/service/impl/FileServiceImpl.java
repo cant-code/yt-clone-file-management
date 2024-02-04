@@ -15,6 +15,7 @@ import com.cantcode.yt.filemanagement.webapp.repository.entities.RawVideo;
 import com.cantcode.yt.filemanagement.webapp.repository.entities.Videos;
 import com.cantcode.yt.filemanagement.webapp.service.messaging.MessagingService;
 import com.cantcode.yt.filemanagement.webapp.service.spi.FileService;
+import com.cantcode.yt.filemanagement.webapp.service.spi.S3Service;
 import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,7 +23,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 import software.amazon.awssdk.core.sync.RequestBody;
-import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 
 import java.time.LocalDateTime;
@@ -36,20 +36,20 @@ import static org.springframework.util.CollectionUtils.isEmpty;
 public class FileServiceImpl implements FileService {
 
     private static final Logger log = LoggerFactory.getLogger(FileServiceImpl.class);
-    private final S3Client s3Client;
+    private final S3Service s3Service;
     private final MessagingService messagingService;
     private final VideosRepository videosRepository;
     private final RawVideoRepository rawVideoRepository;
     private final S3BucketProperties s3BucketProperties;
     private final EncodedVideosRepository encodedVideosRepository;
 
-    public FileServiceImpl(final S3Client s3Client,
+    public FileServiceImpl(final S3Service s3Service,
                            final VideosRepository videosRepository,
                            final RawVideoRepository rawVideoRepository,
                            final S3BucketProperties s3BucketProperties,
                            final MessagingService messagingService,
                            final EncodedVideosRepository encodedVideosRepository) {
-        this.s3Client = s3Client;
+        this.s3Service = s3Service;
         this.videosRepository = videosRepository;
         this.rawVideoRepository = rawVideoRepository;
         this.s3BucketProperties = s3BucketProperties;
@@ -71,7 +71,7 @@ public class FileServiceImpl implements FileService {
 
             String logFileName = fileName.replaceAll("[\n\r]", "_");
             log.info("Uploading file to S3 for user: {} with fileName: {}", userId, logFileName);
-            s3Client.putObject(request, RequestBody.fromInputStream(multipartFile.getInputStream(), multipartFile.getSize()));
+            s3Service.putObject(request, RequestBody.fromInputStream(multipartFile.getInputStream(), multipartFile.getSize()));
 
             final Videos video = videosRepository.save(createVideo(userId, multipartFile, videoRequest));
 
