@@ -1,5 +1,6 @@
 package com.cantcode.yt.filemanagement.webapp.controller;
 
+import com.cantcode.yt.filemanagement.webapp.model.GenericExceptionBody;
 import com.cantcode.yt.filemanagement.webapp.model.PageModel;
 import com.cantcode.yt.filemanagement.webapp.model.StreamBodyResponse;
 import com.cantcode.yt.filemanagement.webapp.model.VideoListResponse;
@@ -17,7 +18,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 
-import static com.cantcode.yt.filemanagement.webapp.controller.APIDefinition.*;
+import static com.cantcode.yt.filemanagement.webapp.controller.APIDefinition.STREAM_VIDEO;
+import static com.cantcode.yt.filemanagement.webapp.controller.APIDefinition.VIDEOS_BASE_URL;
 import static com.cantcode.yt.filemanagement.webapp.controller.Range.parseHttpRangeString;
 import static com.cantcode.yt.filemanagement.webapp.utils.StreamingConstants.*;
 import static org.springframework.http.HttpHeaders.*;
@@ -38,15 +40,18 @@ public class VideosController {
     }
 
     @Operation(summary = "Stream Video in chunks", responses = {
-            @ApiResponse(responseCode = "206",  description = "Video chunk", content = @Content(mediaType = "video/*",
-                    schema = @Schema(implementation = StreamingResponseBody.class)))
+            @ApiResponse(responseCode = "206", description = "Video chunk", content = @Content(mediaType = "video/*",
+                    schema = @Schema(implementation = StreamingResponseBody.class))),
+            @ApiResponse(responseCode = "400", description = "Invalid Param", content = @Content(mediaType = APPLICATION_JSON_VALUE,
+                    schema = @Schema(implementation = GenericExceptionBody.class)))
     })
     @GetMapping(path = STREAM_VIDEO)
-    public ResponseEntity<StreamingResponseBody> streamVideo(@PathVariable(name = "id") final Long fileId,
-                                                             @RequestHeader(value = RANGE, required = false) final String range) {
+    public ResponseEntity<StreamingResponseBody> streamVideo(@RequestHeader(value = RANGE, required = false) final String range,
+                                                             @PathVariable(name = "id") final Long fileId,
+                                                             @RequestParam(name = "quality", defaultValue = "360") final String quality) {
         log.info("Streaming video for fileId: {}", fileId);
         final Range parsedRange = parseHttpRangeString(range, CHUNK_SIZE);
-        final StreamBodyResponse streamBody = streamingService.streamVideo(fileId, range);
+        final StreamBodyResponse streamBody = streamingService.streamVideo(fileId, quality, range);
         return ResponseEntity.status(PARTIAL_CONTENT)
                 .contentType(MediaType.valueOf(MP4_MEDIA_TYPE))
                 .header(ACCEPT_RANGES, ACCEPTED_RANGE_BYTES)

@@ -4,5 +4,5 @@ import com.cantcode.yt.filemanagement.webapp.model.StreamBodyResponse;
 
 public interface StreamingService {
 
-    StreamBodyResponse streamVideo(Long fileId, String range);
+    StreamBodyResponse streamVideo(Long fileId, String quality, String range);
 }

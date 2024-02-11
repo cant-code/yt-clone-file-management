@@ -1,6 +1,6 @@
 package com.cantcode.yt.filemanagement.webapp.controller;
 
-import com.cantcode.yt.filemanagement.webapp.exceptions.FileUploadException;
+import com.cantcode.yt.filemanagement.webapp.exceptions.GeneralBadRequestException;
 import com.cantcode.yt.filemanagement.webapp.model.GenericExceptionBody;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,8 +13,8 @@ public class RestExceptionHandler {
 
     private static final Logger log = LoggerFactory.getLogger(RestExceptionHandler.class);
 
-    @ExceptionHandler(FileUploadException.class)
-    public ResponseEntity<GenericExceptionBody> handleFileUploadException(final FileUploadException e) {
+    @ExceptionHandler(GeneralBadRequestException.class)
+    public ResponseEntity<GenericExceptionBody> handleFileUploadException(final GeneralBadRequestException e) {
         log.error(e.getMessage(), e);
 
         return ResponseEntity
