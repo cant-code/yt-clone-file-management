@@ -2,6 +2,9 @@ package com.cantcode.yt.filemanagement.webapp.controller;
 
 import com.cantcode.yt.filemanagement.webapp.model.UploadVideoRequest;
 import com.cantcode.yt.filemanagement.webapp.service.spi.FileService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
@@ -19,6 +22,7 @@ import static org.springframework.http.MediaType.MULTIPART_FORM_DATA_VALUE;
 
 @RestController
 @RequestMapping(path = VIDEOS_BASE_URL)
+@SecurityRequirement(name = "oauth2")
 public class FileController {
 
     private static final Logger log = LoggerFactory.getLogger(FileController.class);
@@ -28,12 +32,15 @@ public class FileController {
         this.fileService = fileService;
     }
 
+    @Operation(summary = "Upload video", responses = {
+            @ApiResponse(responseCode = "200", description = "Video uploaded successfully")
+    })
     @PostMapping(path = UPLOAD, consumes = MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<Void> uploadVideo(final JwtAuthenticationToken principal,
                                             @RequestPart final MultipartFile file,
                                             @RequestPart(name = "videoDetails") final UploadVideoRequest request) {
         log.info("Uploading file for user: {}", principal.getToken().getSubject());
         fileService.uploadFile(principal.getToken().getSubject(), file, request);
-        return ResponseEntity.ok(null);
+        return ResponseEntity.ok().build();
     }
 }

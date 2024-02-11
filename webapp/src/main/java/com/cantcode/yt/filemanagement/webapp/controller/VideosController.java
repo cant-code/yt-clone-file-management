@@ -5,8 +5,13 @@ import com.cantcode.yt.filemanagement.webapp.model.StreamBodyResponse;
 import com.cantcode.yt.filemanagement.webapp.model.VideoListResponse;
 import com.cantcode.yt.filemanagement.webapp.service.spi.StreamingService;
 import com.cantcode.yt.filemanagement.webapp.service.spi.VideoService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,6 +22,7 @@ import static com.cantcode.yt.filemanagement.webapp.controller.Range.parseHttpRa
 import static com.cantcode.yt.filemanagement.webapp.utils.StreamingConstants.*;
 import static org.springframework.http.HttpHeaders.*;
 import static org.springframework.http.HttpStatus.PARTIAL_CONTENT;
+import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
 
 @RestController
 @RequestMapping(path = VIDEOS_BASE_URL)
@@ -31,6 +37,10 @@ public class VideosController {
         this.videoService = videoService;
     }
 
+    @Operation(summary = "Stream Video in chunks", responses = {
+            @ApiResponse(responseCode = "206",  description = "Video chunk", content = @Content(mediaType = "video/*",
+                    schema = @Schema(implementation = StreamingResponseBody.class)))
+    })
     @GetMapping(path = STREAM_VIDEO)
     public ResponseEntity<StreamingResponseBody> streamVideo(@PathVariable(name = "id") final Long fileId,
                                                              @RequestHeader(value = RANGE, required = false) final String range) {
@@ -45,8 +55,12 @@ public class VideosController {
                 .body(streamBody.body());
     }
 
+    @Operation(summary = "Get Video page", responses = {
+            @ApiResponse(responseCode = "200", description = "Video Page", content = @Content(mediaType = APPLICATION_JSON_VALUE,
+                    schema = @Schema(implementation = VideoListResponse.class)))
+    })
     @GetMapping
-    public ResponseEntity<VideoListResponse> getVideosList(final PageModel pageModel) {
+    public ResponseEntity<VideoListResponse> getVideosList(@ParameterObject final PageModel pageModel) {
         log.info("Fetching videos page");
         return ResponseEntity.ok(videoService.getVideoPage(pageModel));
     }
