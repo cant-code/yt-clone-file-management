@@ -10,6 +10,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class VideoServiceImpl implements VideoService {
@@ -23,6 +24,7 @@ public class VideoServiceImpl implements VideoService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public VideoListResponse getVideoPage(final PageModel pageModel) {
         final Page<Videos> videos = videosRepository.findAll(
                 PageRequest.of(pageModel.getPage(), pageModel.getSize(),
