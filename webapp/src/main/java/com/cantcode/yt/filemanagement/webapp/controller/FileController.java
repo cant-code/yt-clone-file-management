@@ -12,12 +12,13 @@ import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import static com.cantcode.yt.filemanagement.webapp.controller.APIDefinition.FILE_MANAGEMENT_BASE_URL;
-import static com.cantcode.yt.filemanagement.webapp.controller.APIDefinition.VIDEO;
+
+import static com.cantcode.yt.filemanagement.webapp.controller.APIDefinition.UPLOAD;
+import static com.cantcode.yt.filemanagement.webapp.controller.APIDefinition.VIDEOS_BASE_URL;
 import static org.springframework.http.MediaType.MULTIPART_FORM_DATA_VALUE;
 
 @RestController
-@RequestMapping(path = FILE_MANAGEMENT_BASE_URL)
+@RequestMapping(path = VIDEOS_BASE_URL)
 public class FileController {
 
     private static final Logger log = LoggerFactory.getLogger(FileController.class);
@@ -27,7 +28,7 @@ public class FileController {
         this.fileService = fileService;
     }
 
-    @PostMapping(path = VIDEO, consumes = MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(path = UPLOAD, consumes = MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<Void> uploadVideo(final JwtAuthenticationToken principal,
                                             @RequestPart final MultipartFile file,
                                             @RequestPart(name = "videoDetails") final UploadVideoRequest request) {
