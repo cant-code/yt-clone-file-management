@@ -3,6 +3,7 @@ package com.cantcode.yt.filemanagement.webapp.model;
 public class FileDetail {
     private String fileName;
     private int quality;
+    private long size;
     private boolean success;
     private String error;
 
@@ -36,5 +37,13 @@ public class FileDetail {
 
     public void setError(String error) {
         this.error = error;
+    }
+
+    public long getSize() {
+        return size;
+    }
+
+    public void setSize(long size) {
+        this.size = size;
     }
 }

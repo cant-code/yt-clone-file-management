@@ -73,7 +73,7 @@ public class FileServiceImpl implements FileService {
             log.info("Uploading file to S3 for user: {} with fileName: {}", userId, logFileName);
             s3Service.putObject(request, RequestBody.fromInputStream(multipartFile.getInputStream(), multipartFile.getSize()));
 
-            final Videos video = videosRepository.save(createVideo(userId, multipartFile, videoRequest));
+            final Videos video = videosRepository.save(createVideo(userId, videoRequest));
 
             final RawVideo rawVideo = rawVideoRepository.save(createRawVideo(multipartFile, video, fileName));
 
@@ -95,14 +95,13 @@ public class FileServiceImpl implements FileService {
         if (!isEmpty(message.getFiles())) {
             final List<EncodedVideo> videos = new ArrayList<>();
             message.getFiles()
-                    .stream()
-                    .filter(FileDetail::isSuccess)
                     .forEach(fileDetail -> {
                         if (fileDetail.isSuccess()) {
                             final EncodedVideo video = new EncodedVideo();
                             video.setVideoId(message.getFileId());
                             video.setLink(fileDetail.getFileName());
                             video.setQuality(String.valueOf(fileDetail.getQuality()));
+                            video.setSize(fileDetail.getSize());
                             videos.add(video);
                         } else {
                             log.error(fileDetail.getError());
@@ -142,13 +141,12 @@ public class FileServiceImpl implements FileService {
         return rawVideo;
     }
 
-    private Videos createVideo(final String userId, final MultipartFile multipartFile, final UploadVideoRequest videoRequest) {
+    private Videos createVideo(final String userId, final UploadVideoRequest videoRequest) {
         final Videos videos = new Videos();
         videos.setTitle(videoRequest.getTitle());
         videos.setDescription(videoRequest.getDescription());
         videos.setStatus(TranscodingStatus.CREATED);
         videos.setUserId(UUID.fromString(userId));
-        videos.setLength(multipartFile.getSize());
         return videos;
     }
 

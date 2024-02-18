@@ -33,9 +33,6 @@ public class Videos {
     @Column(name = "DESCRIPTION")
     private String description;
 
-    @Column(name = "LENGTH")
-    private Long length;
-
     @Column(name = "STATUS", length = 20)
     @Enumerated(EnumType.STRING)
     private TranscodingStatus status;
@@ -78,14 +75,6 @@ public class Videos {
 
     public void setDescription(String description) {
         this.description = description;
-    }
-
-    public Long getLength() {
-        return length;
-    }
-
-    public void setLength(Long length) {
-        this.length = length;
     }
 
     public TranscodingStatus getStatus() {
