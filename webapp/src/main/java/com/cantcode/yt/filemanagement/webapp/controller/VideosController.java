@@ -6,6 +6,7 @@ import com.cantcode.yt.filemanagement.webapp.model.StreamBodyResponse;
 import com.cantcode.yt.filemanagement.webapp.model.VideoListResponse;
 import com.cantcode.yt.filemanagement.webapp.service.spi.StreamingService;
 import com.cantcode.yt.filemanagement.webapp.service.spi.VideoService;
+import com.cantcode.yt.filemanagement.webapp.utils.Range;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -20,7 +21,7 @@ import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBo
 
 import static com.cantcode.yt.filemanagement.webapp.controller.APIDefinition.STREAM_VIDEO;
 import static com.cantcode.yt.filemanagement.webapp.controller.APIDefinition.VIDEOS_BASE_URL;
-import static com.cantcode.yt.filemanagement.webapp.controller.Range.parseHttpRangeString;
+import static com.cantcode.yt.filemanagement.webapp.utils.Range.parseHttpRangeString;
 import static com.cantcode.yt.filemanagement.webapp.utils.StreamingConstants.*;
 import static org.springframework.http.HttpHeaders.*;
 import static org.springframework.http.HttpStatus.PARTIAL_CONTENT;

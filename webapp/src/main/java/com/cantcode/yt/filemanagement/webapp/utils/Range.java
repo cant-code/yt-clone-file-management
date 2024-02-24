@@ -1,4 +1,4 @@
-package com.cantcode.yt.filemanagement.webapp.controller;
+package com.cantcode.yt.filemanagement.webapp.utils;
 
 public class Range {
     private final long start;

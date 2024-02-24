@@ -1,7 +1,5 @@
 package com.cantcode.yt.filemanagement.webapp.utils;
 
-import com.cantcode.yt.filemanagement.webapp.controller.Range;
-
 import java.util.List;
 
 public class StreamingConstants {

@@ -14,8 +14,6 @@ public class VideoDetail {
 
     private String description;
 
-    private Long length;
-
     private TranscodingStatus status;
 
     public Long getId() {
@@ -48,14 +46,6 @@ public class VideoDetail {
 
     public void setDescription(String description) {
         this.description = description;
-    }
-
-    public Long getLength() {
-        return length;
-    }
-
-    public void setLength(Long length) {
-        this.length = length;
     }
 
     public TranscodingStatus getStatus() {
