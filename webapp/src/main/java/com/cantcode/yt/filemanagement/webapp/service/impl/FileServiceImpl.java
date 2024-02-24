@@ -3,10 +3,7 @@ package com.cantcode.yt.filemanagement.webapp.service.impl;
 import com.cantcode.yt.filemanagement.webapp.configs.properties.S3BucketProperties;
 import com.cantcode.yt.filemanagement.webapp.enums.TranscodingStatus;
 import com.cantcode.yt.filemanagement.webapp.exceptions.FileUploadException;
-import com.cantcode.yt.filemanagement.webapp.model.FileDetail;
-import com.cantcode.yt.filemanagement.webapp.model.FileManagementMessage;
-import com.cantcode.yt.filemanagement.webapp.model.FileProcessingMessage;
-import com.cantcode.yt.filemanagement.webapp.model.UploadVideoRequest;
+import com.cantcode.yt.filemanagement.webapp.model.*;
 import com.cantcode.yt.filemanagement.webapp.repository.EncodedVideosRepository;
 import com.cantcode.yt.filemanagement.webapp.repository.RawVideoRepository;
 import com.cantcode.yt.filemanagement.webapp.repository.VideosRepository;
@@ -16,13 +13,14 @@ import com.cantcode.yt.filemanagement.webapp.repository.entities.Videos;
 import com.cantcode.yt.filemanagement.webapp.service.messaging.MessagingService;
 import com.cantcode.yt.filemanagement.webapp.service.spi.FileService;
 import com.cantcode.yt.filemanagement.webapp.service.spi.S3Service;
-import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 import software.amazon.awssdk.core.sync.RequestBody;
+import software.amazon.awssdk.services.s3.model.GetObjectRequest;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 
 import java.time.LocalDateTime;
@@ -89,6 +87,17 @@ public class FileServiceImpl implements FileService {
     public void processMessage(final FileManagementMessage message) {
         saveEncodedVideos(message);
         updateVideoStatus(message);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public StreamBodyResponse downloadVideo(final Long videoId, final String quality) {
+        final EncodedVideo encodedVideo = encodedVideosRepository.findByVideoIdAndQuality(videoId, quality).orElseThrow();
+        final GetObjectRequest request = GetObjectRequest.builder()
+                .bucket(s3BucketProperties.getTranscodedVideos())
+                .key(encodedVideo.getLink())
+                .build();
+        return new StreamBodyResponse(s3Service.getObject(request)::transferTo, encodedVideo.getSize());
     }
 
     private void saveEncodedVideos(final FileManagementMessage message) {
