@@ -21,6 +21,6 @@ jobs:
     with:
       DOCKER_TAG: damnationcantcode/yt-clone-file-management
       ARTIFACT_NAME: yt-clone-file-management-webapp
-      ARTIFACT_PATH: webapp/target
+      ARTIFACT_PATH: target
       DOCKERFILE_PATH: ./webapp/Dockerfile
     secrets: inherit
