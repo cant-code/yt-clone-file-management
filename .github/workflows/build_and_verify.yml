@@ -1,0 +1,16 @@
+name: Build and Verify change
+
+on:
+  pull_request:
+    types: [ opened, synchronize, reopened ]
+
+jobs:
+  build:
+    uses: cant-code/github-workflows/.github/workflows/java-spring-workflow.yml@main
+    name: Build and verify
+    with:
+      SONAR_PROJECT_KEY: cant-code_yt-clone-file-management
+      ARTIFACT_NAME: yt-clone-file-management-webapp
+      ARTIFACT_PATH: target/webapp*.jar
+      CREATE_ARTIFACT: false
+    secrets: inherit

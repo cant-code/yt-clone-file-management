@@ -1,0 +1,25 @@
+name: Build and Push Image
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    uses: cant-code/github-workflows/.github/workflows/java-spring-workflow.yml@main
+    name: Build and verify
+    with:
+      SONAR_PROJECT_KEY: cant-code_yt-clone-file-management
+      ARTIFACT_NAME: yt-clone-file-management-webapp
+      ARTIFACT_PATH: webapp/target/webapp*.jar
+    secrets: inherit
+
+  create-image:
+    name: Build Image and Push
+    needs: build
+    uses: cant-code/github-workflows/.github/workflows/docker-push.yml@main
+    with:
+      DOCKER_TAG: damnationcantcode/yt-clone-file-management
+      ARTIFACT_NAME: yt-clone-file-management-webapp
+      ARTIFACT_PATH: webapp/target
+    secrets: inherit
