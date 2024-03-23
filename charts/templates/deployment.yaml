@@ -59,6 +59,12 @@ spec:
               value: test_service_user
             - name: SPRING_DATASOURCE_USERNAME
               value: service_user
+            - name: AWS_S3_URL
+              value: http://minio-service.minio-dev.svc.cluster.local:9090
+            - name: AWS_S3_ACCESSKEY
+              value: anckFjZ6lShgxwrzGWx4
+            - name: AWS_S3_SECRETKEY
+              value: phwshAvwjdjEwC1Gb7uHrHNxjRwpKjiWrJHXl8zT
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
       {{- with .Values.nodeSelector }}
