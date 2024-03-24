@@ -11,9 +11,5 @@ spec:
       targetPort: http
       protocol: TCP
       name: http
-    - port: {{ .Values.management.port }}
-      targetPort: actuator
-      protocol: TCP
-      name: actuator
   selector:
     {{- include "charts.selectorLabels" . | nindent 4 }}

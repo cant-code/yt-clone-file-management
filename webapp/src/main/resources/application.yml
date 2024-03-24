@@ -23,3 +23,12 @@ aws:
     buckets:
       raw-videos: raw-videos
       transcoded-videos: transcoded-videos
+management:
+  health:
+    livenessstate:
+      enabled: true
+    readinessstate:
+      enabled: true
+  endpoint:
+    health:
+      show-components: always
