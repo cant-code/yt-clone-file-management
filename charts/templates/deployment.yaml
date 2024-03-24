@@ -62,9 +62,11 @@ spec:
             - name: AWS_S3_URL
               value: http://minio-service.minio-dev.svc.cluster.local:9000
             - name: AWS_S3_ACCESSKEY
-              value: anckFjZ6lShgxwrzGWx4
+              value: gQPRlWAi4ox1LVoEw3cJ
             - name: AWS_S3_SECRETKEY
-              value: phwshAvwjdjEwC1Gb7uHrHNxjRwpKjiWrJHXl8zT
+              value: oFQLHSHrCMPLrfyhgkCbJbty4R3tBUf1hvQKCrSP
+            - name: SPRING_ARTEMIS_BROKER-URL
+              value: tcp://artemis-service.artemis-dev.svc.cluster.local:61616
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
       {{- with .Values.nodeSelector }}
