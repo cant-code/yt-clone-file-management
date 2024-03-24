@@ -40,13 +40,13 @@ spec:
           livenessProbe:
             httpGet:
               path: /actuator/health
-              port: http
+              port: {{ .Values.service.port }}
             initialDelaySeconds: {{ .Values.probes.initialDelaySeconds }}
             periodSeconds: {{ .Values.probes.periodSeconds }}
           readinessProbe:
             httpGet:
               path: /actuator/health
-              port: http
+              port: {{ .Values.service.port }}
             initialDelaySeconds: {{ .Values.probes.initialDelaySeconds }}
             periodSeconds: {{ .Values.probes.periodSeconds }}
           env:
@@ -68,6 +68,8 @@ spec:
               value: artemis
             - name: SPRING_ARTEMIS_PASSWORD
               value: artemis
+            - name: SPRING.SECURITY.OAUTH2.RESOURCESERVER.JWT.ISSUER-URI
+              value: http://keycloak.keycloak.svc.cluster.local:8080/realms/yt-clone
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
       {{- with .Values.nodeSelector }}
