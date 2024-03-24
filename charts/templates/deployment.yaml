@@ -67,6 +67,10 @@ spec:
               value: oFQLHSHrCMPLrfyhgkCbJbty4R3tBUf1hvQKCrSP
             - name: SPRING_ARTEMIS_BROKER-URL
               value: tcp://artemis-service.artemis-dev.svc.cluster.local:61616
+            - name: SPRING_ARTEMIS_USER
+              value: artemis
+            - name: SPRING_ARTEMIS_PASSWORD
+              value: artemis
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
       {{- with .Values.nodeSelector }}
