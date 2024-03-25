@@ -40,6 +40,12 @@ spec:
               value: test_service_user
             - name: SPRING_DATASOURCE_USERNAME
               value: service_user
+            - name: SPRING_LIQUIBASE_URL
+              value: jdbc:postgresql://postgres-postgresql.postgres.svc.cluster.local:5432/file_management
+            - name: SPRING_LIQUIBASE_USER
+              value: service_user
+            - name: SPRING_LIQUIBASE_PASSWORD
+              value: test_service_user
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
       containers:
