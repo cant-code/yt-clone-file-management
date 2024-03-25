@@ -27,6 +27,21 @@ spec:
       serviceAccountName: {{ include "charts.serviceAccountName" . }}
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      initContainers:
+        - name: {{ .Values.database.name }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.database.repository }}:{{ .Values.database.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.database.pullPolicy }}
+          env:
+            - name: SPRING_DATASOURCE_URL
+              value: jdbc:postgresql://postgres-postgresql.postgres.svc.cluster.local:5432/file_management
+            - name: SPRING_DATASOURCE_PASSWORD
+              value: test_service_user
+            - name: SPRING_DATASOURCE_USERNAME
+              value: service_user
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
       containers:
         - name: {{ .Chart.Name }}
           securityContext:

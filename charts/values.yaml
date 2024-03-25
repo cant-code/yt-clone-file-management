@@ -10,6 +10,12 @@ image:
   # Overrides the image tag whose default is the chart appVersion.
   tag: latest
 
+database:
+  name: database-loader
+  repository: damnationcantcode/yt-clone-file-management-database
+  pullPolicy: IfNotPresent
+  tag: latest
+
 imagePullSecrets: []
 nameOverride: ""
 fullnameOverride: ""
