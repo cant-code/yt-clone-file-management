@@ -36,7 +36,8 @@ public class StreamingServiceImpl implements StreamingService {
         if (!ACCEPTED_QUALITY_PARAM.contains(quality)) {
             throw new GeneralBadRequestException("Invalid quality. Should be one of: %s".formatted(ACCEPTED_QUALITY_PARAM));
         }
-        final EncodedVideo encodedVideo = encodedVideosRepository.findByVideoIdAndQuality(fileId, quality).orElseThrow();
+        final EncodedVideo encodedVideo = encodedVideosRepository.findByVideoIdAndQuality(fileId, quality)
+                .orElseThrow(() -> new GeneralBadRequestException("File with given id not found"));
         final GetObjectRequest request = GetObjectRequest.builder()
                 .bucket(s3BucketProperties.getTranscodedVideos())
                 .key(encodedVideo.getLink())

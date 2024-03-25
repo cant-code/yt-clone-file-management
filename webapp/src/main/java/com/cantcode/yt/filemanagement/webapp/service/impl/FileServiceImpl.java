@@ -3,6 +3,7 @@ package com.cantcode.yt.filemanagement.webapp.service.impl;
 import com.cantcode.yt.filemanagement.webapp.configs.properties.S3BucketProperties;
 import com.cantcode.yt.filemanagement.webapp.enums.TranscodingStatus;
 import com.cantcode.yt.filemanagement.webapp.exceptions.FileUploadException;
+import com.cantcode.yt.filemanagement.webapp.exceptions.GeneralBadRequestException;
 import com.cantcode.yt.filemanagement.webapp.model.*;
 import com.cantcode.yt.filemanagement.webapp.repository.EncodedVideosRepository;
 import com.cantcode.yt.filemanagement.webapp.repository.RawVideoRepository;
@@ -92,7 +93,8 @@ public class FileServiceImpl implements FileService {
     @Override
     @Transactional(readOnly = true)
     public StreamBodyResponse downloadVideo(final Long videoId, final String quality) {
-        final EncodedVideo encodedVideo = encodedVideosRepository.findByVideoIdAndQuality(videoId, quality).orElseThrow();
+        final EncodedVideo encodedVideo = encodedVideosRepository.findByVideoIdAndQuality(videoId, quality)
+                .orElseThrow(() -> new GeneralBadRequestException("Video with given id not found"));
         final GetObjectRequest request = GetObjectRequest.builder()
                 .bucket(s3BucketProperties.getTranscodedVideos())
                 .key(encodedVideo.getLink())
@@ -131,7 +133,8 @@ public class FileServiceImpl implements FileService {
             default:
                 yield TranscodingStatus.PARTIALLY_PROCESSED;
         };
-        videosRepository.findById(message.getFileId()).ifPresent(videos -> videos.setStatus(status));
+        videosRepository.findById(message.getFileId())
+                .ifPresentOrElse(videos -> videos.setStatus(status), () -> log.warn("Video with id: {} not found", message.getFileId()));
         log.info("Updated video status for videoId: {}", message.getFileId());
     }
 
