@@ -12,6 +12,9 @@ jobs:
       SONAR_PROJECT_KEY: cant-code_yt-clone-file-management
       ARTIFACT_NAME: yt-clone-file-management-webapp
       ARTIFACT_PATH: webapp/target/webapp*.jar
+      EXTRA_ARTIFACT: true
+      EXTRA_ARTIFACT_NAME: yt-clone-file-management-database
+      EXTRA_ARTIFACT_PATH: database/target/database*.jar
     secrets: inherit
 
   create-image:
@@ -23,4 +26,15 @@ jobs:
       ARTIFACT_NAME: yt-clone-file-management-webapp
       ARTIFACT_PATH: target
       DOCKERFILE_PATH: ./webapp/Dockerfile
+    secrets: inherit
+
+  create-image-database:
+    name: Build Database Image and Push
+    needs: build
+    uses: cant-code/github-workflows/.github/workflows/docker-push.yml@main
+    with:
+      DOCKER_TAG: damnationcantcode/yt-clone-file-management-database
+      ARTIFACT_NAME: yt-clone-file-management-database
+      ARTIFACT_PATH: target
+      DOCKERFILE_PATH: ./database/Dockerfile
     secrets: inherit
