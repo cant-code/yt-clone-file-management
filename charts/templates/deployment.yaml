@@ -40,13 +40,13 @@ spec:
           livenessProbe:
             httpGet:
               path: /actuator/health
-              port: {{ .Values.service.port }}
+              port: {{ .Values.management.port }}
             initialDelaySeconds: {{ .Values.probes.initialDelaySeconds }}
             periodSeconds: {{ .Values.probes.periodSeconds }}
           readinessProbe:
             httpGet:
               path: /actuator/health
-              port: {{ .Values.service.port }}
+              port: {{ .Values.management.port }}
             initialDelaySeconds: {{ .Values.probes.initialDelaySeconds }}
             periodSeconds: {{ .Values.probes.periodSeconds }}
           env:
