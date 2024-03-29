@@ -7,8 +7,11 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
+import java.util.UUID;
 
 public interface VideosRepository extends JpaRepository<Videos, Long> {
 
     Page<Videos> findAllByStatusIn(List<TranscodingStatus> statuses, PageRequest pageRequest);
+
+    Page<Videos> findAllByUserId(UUID userId, PageRequest pageRequest);
 }

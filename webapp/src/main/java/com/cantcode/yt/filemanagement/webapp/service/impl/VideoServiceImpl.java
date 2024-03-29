@@ -12,6 +12,8 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.UUID;
+
 import static com.cantcode.yt.filemanagement.webapp.utils.StreamingConstants.PROCESSED_STATUS;
 
 @Service
@@ -28,9 +30,19 @@ public class VideoServiceImpl implements VideoService {
     @Override
     @Transactional(readOnly = true)
     public VideoListResponse getVideoPage(final PageModel pageModel) {
-        final Page<Videos> videos = videosRepository.findAllByStatusIn(PROCESSED_STATUS,
-                PageRequest.of(pageModel.getPage(), pageModel.getSize(),
-                        Sort.by("createdAt").descending().and(Sort.by("id").descending())));
+        final Page<Videos> videos = videosRepository.findAllByStatusIn(PROCESSED_STATUS, getPageRequest(pageModel));
         return videoMapper.videoPageToVideoList(videos);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public VideoListResponse getVideoPageForUser(String userId, final PageModel pageModel) {
+        final Page<Videos> videos = videosRepository.findAllByUserId(UUID.fromString(userId), getPageRequest(pageModel));
+        return videoMapper.videoPageToVideoList(videos);
+    }
+
+    private PageRequest getPageRequest(PageModel pageModel) {
+        return PageRequest.of(pageModel.getPage(), pageModel.getSize(),
+                Sort.by("createdAt").descending().and(Sort.by("id").descending()));
     }
 }

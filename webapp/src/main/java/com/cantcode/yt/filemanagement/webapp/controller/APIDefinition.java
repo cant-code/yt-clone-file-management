@@ -8,6 +8,7 @@ public class APIDefinition {
     public static final String UPLOAD = "/upload";
     public static final String STREAM_VIDEO = "/{id}/stream";
     public static final String DOWNLOAD_VIDEO = "/{id}/download";
+    public static final String STATUS = "/status";
 
     private APIDefinition() {}
 }

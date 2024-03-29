@@ -6,4 +6,6 @@ import com.cantcode.yt.filemanagement.webapp.model.VideoListResponse;
 public interface VideoService {
 
     VideoListResponse getVideoPage(PageModel pageModel);
+
+    VideoListResponse getVideoPageForUser(String userId, PageModel pageModel);
 }

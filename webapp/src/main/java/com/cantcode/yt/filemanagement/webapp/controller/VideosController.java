@@ -16,11 +16,11 @@ import org.slf4j.LoggerFactory;
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 
-import static com.cantcode.yt.filemanagement.webapp.controller.APIDefinition.STREAM_VIDEO;
-import static com.cantcode.yt.filemanagement.webapp.controller.APIDefinition.VIDEOS_BASE_URL;
+import static com.cantcode.yt.filemanagement.webapp.controller.APIDefinition.*;
 import static com.cantcode.yt.filemanagement.webapp.utils.Range.parseHttpRangeString;
 import static com.cantcode.yt.filemanagement.webapp.utils.StreamingConstants.*;
 import static org.springframework.http.HttpHeaders.*;
@@ -69,5 +69,16 @@ public class VideosController {
     public ResponseEntity<VideoListResponse> getVideosList(@ParameterObject final PageModel pageModel) {
         log.info("Fetching videos page");
         return ResponseEntity.ok(videoService.getVideoPage(pageModel));
+    }
+
+    @Operation(summary = "Get Video page for logged in user", responses = {
+            @ApiResponse(responseCode = "200", description = "Video Page", content = @Content(mediaType = APPLICATION_JSON_VALUE,
+                    schema = @Schema(implementation = VideoListResponse.class)))
+    })
+    @GetMapping(STATUS)
+    public ResponseEntity<VideoListResponse> getVideosPageForUser(final JwtAuthenticationToken principal,
+                                                                  @ParameterObject final PageModel pageModel) {
+        log.info("Fetching videos page for user: {}", principal.getToken().getSubject());
+        return ResponseEntity.ok(videoService.getVideoPageForUser(principal.getToken().getSubject(), pageModel));
     }
 }

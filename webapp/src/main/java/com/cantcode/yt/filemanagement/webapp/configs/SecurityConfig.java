@@ -7,6 +7,7 @@ import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.web.SecurityFilterChain;
 
+import static com.cantcode.yt.filemanagement.webapp.controller.APIDefinition.STATUS;
 import static com.cantcode.yt.filemanagement.webapp.controller.APIDefinition.VIDEOS_BASE_URL;
 
 @Configuration
@@ -16,6 +17,7 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
                 .authorizeHttpRequests(authorize -> authorize
+                        .requestMatchers(HttpMethod.GET, VIDEOS_BASE_URL + STATUS).authenticated()
                         .requestMatchers(HttpMethod.GET, VIDEOS_BASE_URL + "/**").permitAll()
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/actuator/**").permitAll()
                         .anyRequest().authenticated()
