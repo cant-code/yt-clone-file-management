@@ -5,6 +5,8 @@ spring:
   artemis:
     user: artemis
     password: artemis
+  jpa:
+    show-sql: true
 aws:
   s3:
     accessKey: ievgIQw0QLGQhbTPqvE4
