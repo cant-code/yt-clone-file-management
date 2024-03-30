@@ -39,7 +39,7 @@ public class FileController {
     }
 
     @Operation(summary = "Upload video", responses = {
-            @ApiResponse(responseCode = "200", description = "Video uploaded successfully")
+            @ApiResponse(responseCode = "201", description = "Video uploaded successfully")
     })
     @PostMapping(path = UPLOAD, consumes = MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<Void> uploadVideo(final JwtAuthenticationToken principal,
@@ -47,7 +47,7 @@ public class FileController {
                                             @RequestPart(name = "videoDetails") final UploadVideoRequest request) {
         log.info("Uploading file for user: {}", principal.getToken().getSubject());
         fileService.uploadFile(principal.getToken().getSubject(), file, request);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.accepted().build();
     }
 
     @Operation(summary = "Download video", responses = {
