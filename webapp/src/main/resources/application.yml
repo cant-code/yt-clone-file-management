@@ -25,7 +25,7 @@ aws:
       transcoded-videos: transcoded-videos
 management:
   server:
-    port: 18080
+    port: 18070
   health:
     livenessstate:
       enabled: true
@@ -34,3 +34,7 @@ management:
   endpoint:
     health:
       show-components: always
+server:
+  port: 8070
+  servlet:
+    context-path: /file-management
