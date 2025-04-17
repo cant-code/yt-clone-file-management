@@ -1,9 +1,6 @@
 package com.cantcode.yt.filemanagement.webapp.controller;
 
-import com.cantcode.yt.filemanagement.webapp.model.GenericExceptionBody;
-import com.cantcode.yt.filemanagement.webapp.model.PageModel;
-import com.cantcode.yt.filemanagement.webapp.model.StreamBodyResponse;
-import com.cantcode.yt.filemanagement.webapp.model.VideoListResponse;
+import com.cantcode.yt.filemanagement.webapp.model.*;
 import com.cantcode.yt.filemanagement.webapp.service.spi.StreamingService;
 import com.cantcode.yt.filemanagement.webapp.service.spi.VideoService;
 import com.cantcode.yt.filemanagement.webapp.utils.Range;
@@ -80,5 +77,14 @@ public class VideosController {
                                                                   @ParameterObject final PageModel pageModel) {
         log.info("Fetching videos page for user: {}", principal.getToken().getSubject());
         return ResponseEntity.ok(videoService.getVideoPageForUser(principal.getToken().getSubject(), pageModel));
+    }
+
+    @Operation(summary = "Get Video by video-id", responses = {
+            @ApiResponse(responseCode = "200", description = "Video", content = @Content(mediaType = APPLICATION_JSON_VALUE,
+                    schema = @Schema(implementation = VideoListResponse.class)))
+    })
+    @GetMapping(VIDEO_ID)
+    public ResponseEntity<VideoDetail> getVideoById(@PathVariable(name = "id") final Long videoId) {
+        return ResponseEntity.ok(videoService.getVideoById(videoId));
     }
 }

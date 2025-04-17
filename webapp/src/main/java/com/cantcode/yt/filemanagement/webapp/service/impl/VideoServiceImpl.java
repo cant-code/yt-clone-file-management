@@ -1,6 +1,7 @@
 package com.cantcode.yt.filemanagement.webapp.service.impl;
 
 import com.cantcode.yt.filemanagement.webapp.model.PageModel;
+import com.cantcode.yt.filemanagement.webapp.model.VideoDetail;
 import com.cantcode.yt.filemanagement.webapp.model.VideoListResponse;
 import com.cantcode.yt.filemanagement.webapp.repository.VideosRepository;
 import com.cantcode.yt.filemanagement.webapp.repository.entities.Videos;
@@ -39,6 +40,13 @@ public class VideoServiceImpl implements VideoService {
     public VideoListResponse getVideoPageForUser(String userId, final PageModel pageModel) {
         final Page<Videos> videos = videosRepository.findAllByUserId(UUID.fromString(userId), getPageRequest(pageModel));
         return videoMapper.videoPageToVideoList(videos);
+    }
+
+    @Override
+    public VideoDetail getVideoById(Long videoId) {
+        return videosRepository.findById(videoId)
+                .map(videoMapper::videoToVideoDetail)
+                .orElse(null);
     }
 
     private PageRequest getPageRequest(PageModel pageModel) {

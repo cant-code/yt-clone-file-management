@@ -36,5 +36,3 @@ management:
       show-components: always
 server:
   port: 8070
-  servlet:
-    context-path: /file-management
